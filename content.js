@@ -1,20 +1,5 @@
 // (function() {
-//   // Create the horizontal bar element
-//   const bar = document.createElement('div');
-//   bar.id = 'horizontalBarOverlay';
-//   bar.className = 'horizontal-bar';
-
-//   // Add the bar to the document
-//   document.body.appendChild(bar);
-
-//   // Handle bar movement
-//   window.addEventListener('mousemove', (event) => {
-//     const y = event.clientY;
-//     bar.style.top = `${y}px`;
-//   });
-// })();
-
-// (function() {
+//   // Create two overlay elements
 //   const topOverlay = document.createElement('div');
 //   const bottomOverlay = document.createElement('div');
 
@@ -26,40 +11,71 @@
 //   document.body.appendChild(bottomOverlay);
 
 //   // Handle overlay movement
-//   window.addEventListener('mousemove', (event) => {
+//   function updateOverlays(event) {
 //     const y = event.clientY;
-//     const gap = 50; // Height of the gap around the mouse
+//     const gap = 150; // Height of the gap around the mouse
 
 //     topOverlay.style.height = `${Math.max(0, y - gap/2)}px`;
 //     bottomOverlay.style.top = `${y + gap/2}px`;
 //     bottomOverlay.style.height = `${Math.max(0, window.innerHeight - y - gap/2)}px`;
-//   });
+//   }
+
+//   window.addEventListener('mousemove', updateOverlays);
+
+//   // Initial positioning
+//   updateOverlays({ clientY: window.innerHeight / 2 });
 // })();
 
-(function() {
-  // Create two overlay elements
-  const topOverlay = document.createElement('div');
-  const bottomOverlay = document.createElement('div');
+let topOverlay, bottomOverlay;
 
-  topOverlay.className = 'overlay top-overlay';
-  bottomOverlay.className = 'overlay bottom-overlay';
+function createOverlays() {
+  if (!topOverlay && !bottomOverlay) {
+    topOverlay = document.createElement('div');
+    bottomOverlay = document.createElement('div');
 
-  // Add the overlays to the document
-  document.body.appendChild(topOverlay);
-  document.body.appendChild(bottomOverlay);
+    topOverlay.className = 'overlay top-overlay';
+    bottomOverlay.className = 'overlay bottom-overlay';
 
-  // Handle overlay movement
-  function updateOverlays(event) {
-    const y = event.clientY;
-    const gap = 150; // Height of the gap around the mouse
+    document.body.appendChild(topOverlay);
+    document.body.appendChild(bottomOverlay);
 
-    topOverlay.style.height = `${Math.max(0, y - gap/2)}px`;
-    bottomOverlay.style.top = `${y + gap/2}px`;
-    bottomOverlay.style.height = `${Math.max(0, window.innerHeight - y - gap/2)}px`;
+    window.addEventListener('mousemove', updateOverlays);
+    updateOverlays({ clientY: window.innerHeight / 2 });
   }
+}
 
-  window.addEventListener('mousemove', updateOverlays);
+function removeOverlays() {
+  if (topOverlay) {
+    topOverlay.remove();
+    topOverlay = null;
+  }
+  if (bottomOverlay) {
+    bottomOverlay.remove();
+    bottomOverlay = null;
+  }
+  window.removeEventListener('mousemove', updateOverlays);
+}
 
-  // Initial positioning
-  updateOverlays({ clientY: window.innerHeight / 2 });
-})();
+function updateOverlays(event) {
+  const y = event.clientY;
+  const gap = 150;
+
+  topOverlay.style.height = `${Math.max(0, y - gap/2)}px`;
+  bottomOverlay.style.top = `${y + gap/2}px`;
+  bottomOverlay.style.height = `${Math.max(0, window.innerHeight - y - gap/2)}px`;
+}
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.action === 'enable') {
+    createOverlays();
+  } else if (request.action === 'disable') {
+    removeOverlays();
+  }
+});
+
+// Check if the extension is enabled when the content script loads
+chrome.storage.sync.get('isEnabled', (data) => {
+  if (data.isEnabled) {
+    createOverlays();
+  }
+});

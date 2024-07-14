@@ -3,7 +3,7 @@
     "name": "Horizontal Bar Overlay Extension",
     "version": "1.0",
     "description": "Adds a transparent horizontal bar that follows mouse movements.",
-    "permissions": ["activeTab", "scripting"],
+    "permissions": ["activeTab", "scripting","storage"],
     "background": {
       "service_worker": "background.js"
     },
@@ -15,9 +15,10 @@
       }
     ],
     "action": {
+      "default popup": "popup.html",
       "default_icon": {
         "16": "icon16.png",
-        "32": "icon32.png",
+        "32": "icon32.png", 
         "128": "icon128.png"
       }
     }
