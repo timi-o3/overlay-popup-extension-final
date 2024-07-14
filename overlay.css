@@ -1,0 +1,16 @@
+.overlay {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.3); /* Semi-transparent black */
+  z-index: 1000;
+  pointer-events: none; /* Allow clicks to pass through */
+}
+
+.top-overlay {
+  top: 0;
+}
+
+.bottom-overlay {
+  bottom: 0;
+}
