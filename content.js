@@ -1,4 +1,5 @@
 let topOverlay, bottomOverlay;
+const FONT_SIZE_INCREASE = 150; // 150% of original size
 
 function createOverlays() {
   if (!topOverlay && !bottomOverlay) {
@@ -14,6 +15,7 @@ function createOverlays() {
     window.addEventListener('mousemove', updateOverlays);
     updateOverlays({ clientY: window.innerHeight / 2 });
   }
+  setFontSize(FONT_SIZE_INCREASE);
 }
 
 function removeOverlays() {
@@ -26,6 +28,7 @@ function removeOverlays() {
     bottomOverlay = null;
   }
   window.removeEventListener('mousemove', updateOverlays);
+  setFontSize(100); // Reset to original size
 }
 
 function updateOverlays(event) {
@@ -35,6 +38,10 @@ function updateOverlays(event) {
   topOverlay.style.height = `${Math.max(0, y - gap/2)}px`;
   bottomOverlay.style.top = `${y + gap/2}px`;
   bottomOverlay.style.height = `${Math.max(0, window.innerHeight - y - gap/2)}px`;
+}
+
+function setFontSize(size) {
+  document.body.style.fontSize = size + '%';
 }
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
